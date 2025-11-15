@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Checho Postres — Delicias Artesanales</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    body{overflow-x:hidden}
+
+    .logo-img{
+      width:70px;height:70px;object-fit:contain;
+      border-radius:10px;display:block;
+    }
+
+    /* PANEL LATERAL */
+    .menu-panel{
+      position:fixed;top:0;right:-260px;width:240px;height:100%;
+      background:#fffaf5;box-shadow:-2px 0 10px rgba(0,0,0,0.1);
+      padding:30px 20px;display:flex;flex-direction:column;gap:18px;
+      transition:0.35s;z-index:999;
+    }
+    .menu-panel.active{right:0}
+    .menu-panel a{
+      text-decoration:none;font-weight:600;color:#3b1e0e;font-size:1.1rem
+    }
+
+    .close-menu-btn{
+      align-self:flex-end;background:none;border:0;font-size:1.6rem;
+      cursor:pointer;font-weight:600;color:#3b1e0e;margin-bottom:10px;
+    }
+
+    .overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,0.3);
+      opacity:0;pointer-events:none;transition:0.3s;z-index:998;
+    }
+    .overlay.show{opacity:1;pointer-events:auto}
+
+    /* PANEL DE PEDIDOS */
+    .pedido-panel{
+      position:fixed;bottom:-100%;left:0;width:100%;background:white;
+      padding:25px;border-radius:20px 20px 0 0;box-shadow:0 -3px 10px rgba(0,0,0,0.1);
+      transition:0.45s;z-index:1000;
+    }
+    .pedido-panel.active{bottom:0}
+
+    .item{
+      padding:12px;margin-bottom:10px;background:#fffaf5;
+      border-radius:10px;display:flex;align-items:center;
+      justify-content:space-between;
+    }
+
+    .btn-add{
+      background:#f59e0b;color:white;border:0;padding:6px 12px;
+      border-radius:8px;font-weight:600;cursor:pointer;
+    }
+
+    .carrito-box{
+      background:#fffaf5;padding:10px;border-radius:12px;margin-top:10px;
+    }
+
+    .btn-wpp{
+      margin-top:15px;width:100%;background:#25D366;color:white;
+      padding:12px;border-radius:10px;font-weight:600;border:0;cursor:pointer;
+    }
+
+    /* TARJETAS DEL MENÚ */
+    .menu-grid{
+      display:grid;gap:1.4rem;grid-template-columns:1fr;
+    }
+
+    .menu-card{
+      background:white;padding:1rem;border-radius:16px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.08);display:flex;
+      flex-direction:column;text-align:center;gap:0.6rem;
+    }
+
+    .menu-card img{
+      width:100%;height:180px;object-fit:cover;border-radius:14px;
+    }
+
+    .menu-card button{
+      padding:0.6rem 1rem;background:#f59e0b;border:0;border-radius:12px;
+      font-weight:600;color:white;cursor:pointer;
+    }
+
+    @media(min-width:900px){
+      .menu-grid{grid-template-columns:repeat(3,1fr);}
+    }
+
+    /* ESTILO PARA LA IMAGEN HERO */
+    .hero-ill{
+      width:250px;
+      height:250px;
+      object-fit:cover;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="overlay" id="overlay"></div>
+
+  <nav class="menu-panel" id="sideMenu">
+    <button class="close-menu-btn" id="closeMenuBtn">✕</button>
+
+    <a href="#hero">Inicio</a>
+    <a href="#postres">Menú de Postres</a>
+    <a href="#testimonios">Testimonios</a>
+    <a href="#contacto">Contacto</a>
+  </nav>
+
+  <div class="pedido-panel" id="panelPedido">
+    <h2>Hacer Pedido</h2>
+
+    <div id="listaProductos"></div>
+
+    <h3>Carrito</h3>
+    <div class="carrito-box" id="carrito"><i>Aún no has añadido nada.</i></div>
+
+    <button class="btn-wpp" onclick="enviarPedido()">Enviar por WhatsApp</button>
+  </div>
+
+  <div class="container">
+
+    <header>
+      <div class="brand">
+        <img 
+          src="logo-checho.jpg"
+          alt="Logo Checho Postres"
+          class="logo-img"
+          onerror="this.onerror=null; this.src='logo-checho.png.jpg';"
+        >
+
+        <div>
+          <h1>Checho Postres</h1>
+          <div class="small">Delicias artesanales hechas con amor</div>
+        </div>
+      </div>
+
+      <button class="menu-btn" aria-expanded="false" id="menuBtn">☰</button>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="heroTitle" id="hero">
+        <div>
+          <h2 id="heroTitle">Siente el sabor de la felicidad</h2>
+          <p>En <strong>Checho Postres</strong> encontrarás tartas, brownies y dulces caseros elaborados con ingredientes frescos.</p>
+
+          <div class="cta-row">
+            <button class="btn btn-primary" id="btnPedido">Hacer pedido</button>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:center">
+          <img 
+            src="https://picsum.photos/id/1080/250/250" 
+            alt="Variedad de postres" 
+            class="hero-ill"
+          />
+        </div>
+      </section>
+
+      <section id="postres">
+        <h3>Menú de Postres</h3>
+        <div id="menuGrid" class="menu-grid"></div>
+      </section>
+
+      <section class="testimonials" aria-label="Testimonios" id="testimonios">
+        <h3>Lo que dicen nuestros clientes</h3>
+        <div class="testimonial"><div style="font-weight:700">Laura M.</div><p class="small">“Los brownies de Checho son adictivos 😍.”</p></div>
+        <div class="testimonial"><div style="font-weight:700">Andrés P.</div><p class="small">“Postres de calidad superior.”</p></div>
+      </section>
+
+      <section id="contacto" style="margin-top:20px">
+        <h3>Contacto</h3>
+        <p class="small">WhatsApp: <strong>+57 316 5427145</strong></p>
+        <p class="small">Instagram: <strong>@0checho</strong></p>
+      </section>
+
+      <footer>
+        <div class="small">© 2025 Checho Postres · Endulzando vidas con amor 🍰</div>
+      </footer>
+
+    </main>
+  </div>
+
+  <script>
+    /* PRODUCTOS (IMÁGENES FUNCIONANDO) */
+    const productos = [
+      { 
+        nombre:"Brownie", 
+        precio:6000, 
+        img:"https://images.unsplash.com/photo-1606312619070-d48da656d1c3?auto=format&fit=crop&w=800&q=60" 
+      },
+      { 
+        nombre:"Tarta de Fresa", 
+        precio:10000, 
+        img:"https://images.unsplash.com/photo-1553547274-28c600b90a40?auto=format&fit=crop&w=800&q=60" 
+      },
+      { 
+        nombre:"Cheesecake", 
+        precio:12000, 
+        img:"https://images.unsplash.com/photo-1601315379731-9db59e2ddd9f?auto=format&fit=crop&w=800&q=60" 
+      },
+      {
+        nombre:"Cupcake Arcoíris",
+        precio:4500,
+        img:"https://images.unsplash.com/photo-1563729783300-84c47864f1d5?auto=format&fit=crop&w=800&q=60"
+      }
+    ];
+
+    /* ELEMENTOS */
+    const menuBtn = document.getElementById('menuBtn');
+    const closeMenuBtn = document.getElementById('closeMenuBtn');
+    const sideMenu = document.getElementById('sideMenu');
+    const overlay = document.getElementById('overlay');
+    const panelPedido = document.getElementById('panelPedido');
+    const btnPedido = document.getElementById('btnPedido');
+
+    /* MENÚ LATERAL */
+    function openMenu(){
+      sideMenu.classList.add("active");
+      overlay.classList.add("show");
+      menuBtn.textContent = "✕";
+      menuBtn.setAttribute("aria-expanded","true");
+    }
+
+    function closeMenu(){
+      sideMenu.classList.remove("active");
+      overlay.classList.remove("show");
+      menuBtn.textContent = "☰";
+      menuBtn.setAttribute("aria-expanded","false");
+    }
+
+    menuBtn.addEventListener('click',()=>{
+      const isOpen = sideMenu.classList.contains("active");
+      isOpen ? closeMenu() : openMenu();
+    });
+
+    closeMenuBtn.addEventListener('click', closeMenu);
+
+    document.querySelectorAll(".menu-panel a").forEach(a=>{
+      a.addEventListener('click', closeMenu);
+    });
+
+    /* PANEL DE PEDIDO */
+    function openPedido(){
+      panelPedido.classList.add("active");
+      overlay.classList.add("show");
+    }
+
+    function closePedido(){
+      panelPedido.classList.remove("active");
+      overlay.classList.remove("show");
+    }
+
+    btnPedido.addEventListener('click', openPedido);
+
+    overlay.addEventListener('click', ()=>{
+      closePedido();
+      closeMenu();
+    });
+
+    /* BOTÓN PARA CERRAR PANEL */
+    const closePedidoBtn = document.createElement("button");
+    closePedidoBtn.textContent = "Cerrar";
+    closePedidoBtn.style.cssText =
+      "width:100%;padding:10px;margin-bottom:15px;background:#ccc;border:0;border-radius:10px;font-weight:600;cursor:pointer";
+
+    panelPedido.prepend(closePedidoBtn);
+
+    closePedidoBtn.addEventListener('click', closePedido);
+
+    /* LISTA DE PRODUCTOS EN PANEL */
+    document.getElementById("listaProductos").innerHTML =
+      productos.map(p => `
+        <div class="item">
+          <span>${p.nombre} — $${p.precio}</span>
+          <button class="btn-add" onclick="agregar('${p.nombre}',${p.precio})">Añadir</button>
+        </div>
+      `).join("");
+
+    /* MOSTRAR PRODUCTOS EN EL MENÚ */
+    document.getElementById("menuGrid").innerHTML =
+      productos.map(p => `
+        <div class="menu-card">
+          <img src="${p.img}">
+          <h4>${p.nombre}</h4>
+          <p class="small">$${p.precio}</p>
+          <button onclick="agregar('${p.nombre}',${p.precio})">Añadir al pedido</button>
+        </div>
+      `).join("");
+
+    /* CARRITO */
+    let carrito = [];
+
+    function agregar(nombre, precio){
+      carrito.push({nombre,precio});
+      renderCarrito();
+      openPedido(); 
+    }
+
+    function renderCarrito(){
+      const box = document.getElementById('carrito');
+
+      if(carrito.length === 0){
+        box.innerHTML = "<i>Aún no has añadido nada.</i>";
+        return;
+      }
+
+      box.innerHTML =
+        carrito.map(item => `<div>${item.nombre} — $${item.precio}</div>`).join("");
+    }
+
+    function enviarPedido(){
+      if(carrito.length === 0){
+        alert("Tu carrito está vacío.");
+        return;
+      }
+
+      let mensaje = "Hola, quiero pedir:\n";
+      carrito.forEach(p => mensaje += `• ${p.nombre} — $${p.precio}\n`);
+
+      const url = "https://wa.me/573000000000?text=" + encodeURIComponent(mensaje);
+      window.open(url, "_blank");
+    }
+  </script>
+
+</body>
+</html>
